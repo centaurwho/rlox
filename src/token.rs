@@ -59,6 +59,7 @@ pub enum Literal {
     Number(u32),
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Token {
     token_type: TokenType,
