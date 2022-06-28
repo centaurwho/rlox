@@ -1,8 +1,6 @@
-use std::{env, fs, io};
-use std::io::{BufRead, Write};
-
-use rustyline::{Editor, Result};
 use rustyline::error::ReadlineError;
+use rustyline::{Editor, Result};
+use std::{env, fs};
 
 mod scanner;
 mod token;

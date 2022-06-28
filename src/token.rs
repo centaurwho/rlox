@@ -1,6 +1,5 @@
 // TODO: Better hierarchy
 #[derive(Debug, Copy, Clone)]
-#[allow(dead_code)]
 pub enum TokenType {
     // Single character tokens
     LeftParen,
@@ -52,6 +51,30 @@ pub enum TokenType {
     Eof,
 }
 
+impl TokenType {
+    pub fn from_keyword(val: &str) -> TokenType {
+        match val {
+            "and" => TokenType::And,
+            "class" => TokenType::Class,
+            "else" => TokenType::Else,
+            "false" => TokenType::False,
+            "for" => TokenType::For,
+            "fun" => TokenType::Fun,
+            "if" => TokenType::If,
+            "nil" => TokenType::Nil,
+            "or" => TokenType::Or,
+            "print" => TokenType::Print,
+            "return" => TokenType::Return,
+            "super" => TokenType::Super,
+            "this" => TokenType::This,
+            "true" => TokenType::True,
+            "var" => TokenType::Var,
+            "while" => TokenType::While,
+            _ => TokenType::Identifier,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Literal {
     None,
@@ -78,16 +101,3 @@ impl Token {
         }
     }
 }
-
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_show() {
-        let t = Token::new(TokenType::Identifier, String::from("9"), Literal::Number(9), 12);
-        println!("{:?}", t);
-    }
-}
-

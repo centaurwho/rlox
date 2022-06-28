@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use lazy_static::lazy_static;
+
 use crate::token::{Literal, Token, TokenType};
 
 pub struct Scanner {
@@ -19,7 +23,7 @@ impl Scanner {
         }
     }
 
-    // Not a mutable self reference since we won't use Scanner ever again
+    // Not borrowing since we won't use Scanner after this call
     pub fn scan_tokens(mut self) -> Vec<Token> {
         while !self.is_at_end() {
             self.start = self.cursor;
@@ -186,13 +190,15 @@ impl Scanner {
         while self.is_alphanumeric(self.peek()) {
             self.advance();
         }
-        self.add_nonliteral(TokenType::Identifier);
+        let text = &self.source[self.start..self.cursor];
+        self.add_nonliteral(TokenType::from_keyword(text));
     }
 }
 
+// TODO: More tests in detail
 #[cfg(test)]
 mod tests {
-    use crate::scanner::Scanner;
+    use crate::scanner::{Scanner, KEYWORDS};
 
     #[test]
     fn scan_tokens() {
