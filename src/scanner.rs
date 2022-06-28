@@ -1,7 +1,3 @@
-use std::collections::HashMap;
-
-use lazy_static::lazy_static;
-
 use crate::token::{Literal, Token, TokenType};
 
 pub struct Scanner {
@@ -147,7 +143,8 @@ impl Scanner {
 
         // TODO: cleanup
         let val = &self.source.as_str()[self.start + 1..self.cursor - 1];
-        self.add_token(TokenType::String, Literal::String(String::from(val)));
+        let literal = Literal::String(String::from(val));
+        self.add_token(TokenType::String, literal);
     }
 
     fn add_nonliteral(&mut self, token_type: TokenType) {
@@ -191,7 +188,8 @@ impl Scanner {
             self.advance();
         }
         let text = &self.source[self.start..self.cursor];
-        self.add_nonliteral(TokenType::from_keyword(text));
+        let tt = TokenType::from_keyword(text);
+        self.add_nonliteral(tt);
     }
 }
 
