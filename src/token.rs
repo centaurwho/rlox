@@ -1,5 +1,5 @@
 // TODO: Better hierarchy
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[allow(dead_code)]
 pub enum TokenType {
     // Single character tokens

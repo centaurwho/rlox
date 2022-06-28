@@ -30,18 +30,13 @@ fn repl() -> Result<()> {
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                if line.len() == 1 {
+                if line.len() == 0 {
                     break;
                 }
                 println!("Line: {}", line);
                 run(line);
             }
-            Err(ReadlineError::Interrupted) => {
-                println!("CTRL-C");
-                break;
-            }
-            Err(ReadlineError::Eof) => {
-                println!("CTRL-D");
+            Err(ReadlineError::Interrupted) | Err(ReadlineError::Eof) => {
                 break;
             }
             Err(err) => {
