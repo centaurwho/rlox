@@ -79,8 +79,16 @@ impl Scanner {
             ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
             '"' => self.string(),
-            // TODO: dont panic
-            _ => panic!("oof"),
+            c => {
+                if self.is_digit(c) {
+                    self.number();
+                } else if self.is_alpha(c) {
+                    self.identifier();
+                } else {
+                    // TODO: dont panic
+                    panic!("oof");
+                }
+            }
         }
     }
 
@@ -134,13 +142,14 @@ impl Scanner {
         self.advance();
 
         // TODO: cleanup
-        let val = &self.source.as_str()[self.start+1..self.cursor-1];
+        let val = &self.source.as_str()[self.start + 1..self.cursor - 1];
         self.add_token(TokenType::String, Literal::String(String::from(val)));
     }
 
     fn add_nonliteral(&mut self, token_type: TokenType) {
         self.add_token(token_type, Literal::None);
     }
+
     fn add_token(&mut self, token_type: TokenType, literal: Literal) {
         let text = &self.source[self.start..self.cursor];
         self.tokens.push(Token::new(
@@ -149,6 +158,35 @@ impl Scanner {
             literal,
             self.line,
         ));
+    }
+
+    fn is_digit(&self, ch: char) -> bool {
+        ch >= '0' && ch <= '9'
+    }
+
+    fn is_alpha(&self, ch: char) -> bool {
+        (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_'
+    }
+
+    fn is_alphanumeric(&self, ch: char) -> bool {
+        self.is_alpha(ch) || self.is_digit(ch)
+    }
+
+    // TODO: Support fractions .3 and 41.
+    fn number(&mut self) {
+        while self.is_digit(self.peek()) {
+            self.advance();
+        }
+
+        let val = self.source[self.start..self.cursor].parse::<u32>().unwrap();
+        self.add_token(TokenType::Number, Literal::Number(val))
+    }
+
+    fn identifier(&mut self) {
+        while self.is_alphanumeric(self.peek()) {
+            self.advance();
+        }
+        self.add_nonliteral(TokenType::Identifier);
     }
 }
 

@@ -1,5 +1,3 @@
-extern crate core;
-
 use std::{env, fs, io};
 use std::io::{BufRead, Write};
 
