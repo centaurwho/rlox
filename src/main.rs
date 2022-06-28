@@ -3,6 +3,9 @@ extern crate core;
 use std::{env, fs, io};
 use std::io::{BufRead, Write};
 
+use rustyline::{Editor, Result};
+use rustyline::error::ReadlineError;
+
 mod scanner;
 mod token;
 
@@ -15,25 +18,39 @@ fn run(source: String) {
     }
 }
 
-fn repl() {
-    let stdin = io::stdin();
-    // TODO: Consider using a REPL crate
+const HISTORY_FILE: &str = "repl.history";
+
+fn repl() -> Result<()> {
+    let mut rl = Editor::<()>::new();
+    if rl.load_history(HISTORY_FILE).is_err() {
+        println!("No previous history.");
+    }
     loop {
-        let mut line = String::new();
-        print!(">>> ");
-        io::stdout().flush();
-        match stdin.lock().read_line(&mut line) {
-            Ok(size) => {
-                // A way to exit REPL without resorting to CTRL+C
-                if size == 1 {
+        let readline = rl.readline(">> ");
+        match readline {
+            Ok(line) => {
+                rl.add_history_entry(line.as_str());
+                if line.len() == 1 {
                     break;
                 }
+                println!("Line: {}", line);
+                run(line);
             }
-            Err(_) => {}
+            Err(ReadlineError::Interrupted) => {
+                println!("CTRL-C");
+                break;
+            }
+            Err(ReadlineError::Eof) => {
+                println!("CTRL-D");
+                break;
+            }
+            Err(err) => {
+                println!("Error: {:?}", err);
+                break;
+            }
         }
-        run(line);
-        // println!("line: {}", line.trim().len());
     }
+    rl.save_history(HISTORY_FILE)
 }
 
 fn run_from_file(filename: &String) {
