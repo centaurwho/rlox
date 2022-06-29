@@ -27,7 +27,8 @@ pub enum TokenType {
     // Literals
     Identifier,
     String,
-    Number,
+    Integer,
+    Float,
 
     // Keywords
     And,
@@ -79,7 +80,8 @@ impl TokenType {
 pub enum Literal {
     None,
     String(String),
-    Number(u32),
+    Integer(u32),
+    Float(f32),
 }
 
 #[allow(dead_code)]

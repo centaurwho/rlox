@@ -46,8 +46,10 @@ impl Scanner {
             '{' => self.add_nonliteral(TokenType::LeftBrace),
             '}' => self.add_nonliteral(TokenType::RightBrace),
             ',' => self.add_nonliteral(TokenType::Comma),
+            // TODO: Support for floats like .4 .5112
             '.' => self.add_nonliteral(TokenType::Dot),
             '-' => self.add_nonliteral(TokenType::Minus),
+            // TODO: Support for negative numbers
             '+' => self.add_nonliteral(TokenType::Plus),
             ';' => self.add_nonliteral(TokenType::Semicolon),
             '*' => self.add_nonliteral(TokenType::Star),
@@ -76,7 +78,7 @@ impl Scanner {
                     self.add_nonliteral(TokenType::Slash)
                 }
             }
-            ' ' | '\r' | '\t' => {}
+            ' ' | '\r' | '\t' => {},
             '\n' => self.line += 1,
             '"' => self.string(),
             c => {
@@ -152,10 +154,10 @@ impl Scanner {
     }
 
     fn add_token(&mut self, token_type: TokenType, literal: Literal) {
-        let text = &self.source[self.start..self.cursor];
+        let text = String::from(self.extract_str());
         self.tokens.push(Token::new(
             token_type,
-            String::from(text),
+            text,
             literal,
             self.line,
         ));
@@ -178,18 +180,30 @@ impl Scanner {
         while self.is_digit(self.peek()) {
             self.advance();
         }
-
-        let val = self.source[self.start..self.cursor].parse::<u32>().unwrap();
-        self.add_token(TokenType::Number, Literal::Number(val))
+        if self.peek() == '.' {
+            self.advance();
+            while self.is_digit(self.peek()) {
+                self.advance();
+            }
+            let val = self.extract_str().parse::<f32>().unwrap();
+            self.add_token(TokenType::Float, Literal::Float(val));
+        } else {
+            let val = self.extract_str().parse::<u32>().unwrap();
+            self.add_token(TokenType::Integer, Literal::Integer(val));
+        };
     }
 
     fn identifier(&mut self) {
         while self.is_alphanumeric(self.peek()) {
             self.advance();
         }
-        let text = &self.source[self.start..self.cursor];
+        let text = self.extract_str();
         let tt = TokenType::from_keyword(text);
         self.add_nonliteral(tt);
+    }
+
+    fn extract_str(&mut self) -> &str {
+        &self.source[self.start..self.cursor]
     }
 }
 
