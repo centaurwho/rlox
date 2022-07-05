@@ -34,7 +34,7 @@ impl Scanner {
         self.tokens
     }
 
-    fn is_at_end(&self) -> bool {
+    fn is_at_end(&self) ->    bool {
         self.cursor >= self.source.len()
     }
 
