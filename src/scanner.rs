@@ -41,6 +41,8 @@ impl Scanner {
     fn scan_token(&mut self) {
         let c = self.advance();
         match c {
+
+
             '(' => self.add_nonliteral(TokenType::LeftParen),
             ')' => self.add_nonliteral(TokenType::RightParen),
             '{' => self.add_nonliteral(TokenType::LeftBrace),
